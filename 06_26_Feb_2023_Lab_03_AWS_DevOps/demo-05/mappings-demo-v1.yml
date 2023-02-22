@@ -1,0 +1,56 @@
+---
+Parameters:
+  EC2SSHKey:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Name of an EC2 KeyPair to enable SSH access
+
+Mappings:
+  SoftwareFeaturesMap:
+    MERN:
+      Accenture: "Accenture App"
+      Fiverr: "Fiverr App"
+      ClickBalance: "ClickBalance App"
+      WineTracker: "WineTracker App"
+    LAMP:
+      Wikipedia: "Wikipedia App"
+      Google: "Google App"
+      WordPress: "Wikipedia App"
+    RubyOnRails:
+      Twitter: "Twitter App"
+      AirBNB: "AirBNB App"
+      Shopify: "Shopify App"
+      Groupon: "Groupon App"
+      GoodReads: "GoodReads App"
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      AvailabilityZone: us-east-1a
+      ImageId: ami-009d6802948d06e52
+      InstanceType: t2.micro
+      Tags:
+        - Key: "Name"
+          Value: "EC2ContainingWebServer"      
+        - Key: "MapResult"
+          Value: !FindInMap [SoftwareFeaturesMap, LAMP, Google]     
+      KeyName: !Ref EC2SSHKey
+      SecurityGroups:
+        - !Ref SSHHTTPSecurityGroup
+
+  SSHHTTPSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: SSH-22 and HTTP-80 Access
+      Tags:
+        - Key: "Name"
+          Value: "SSH-HTTP-DefaultPort-Open"            
+      SecurityGroupIngress:
+      - CidrIp: 0.0.0.0/0
+        FromPort: 22
+        IpProtocol: tcp
+        ToPort: 22
+      - CidrIp: 0.0.0.0/0
+        FromPort: 80
+        IpProtocol: tcp
+        ToPort: 80
